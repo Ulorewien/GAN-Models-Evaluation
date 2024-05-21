@@ -73,7 +73,7 @@ class Noise(nn.Module):
         noise = torch.randn((x.shape[0], 1, x.shape[2], x.shape[3]), device=x.device)
         return x + self.noise_weight + noise
     
-class ConvolutionalLayer(nn.Module):
+class ConvolutionLayer(nn.Module):
     def __init__(self, in_channels, out_channels, kernel_size=3, stride=1, padding=1):
         super().__init__()
         self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride, padding)
@@ -90,10 +90,10 @@ class ConvolutionalLayer(nn.Module):
 class GeneratorBlock(nn.Module):
     def __init__(self, in_channels, out_channels, w_dim):
         super().__init__()
-        self.conv1 = ConvolutionalLayer(in_channels, out_channels)
+        self.conv1 = ConvolutionLayer(in_channels, out_channels)
         self.noise1 = Noise(out_channels)
         self.adain1 = AdaIN(out_channels, w_dim)
-        self.conv2 = ConvolutionalLayer(out_channels, out_channels)
+        self.conv2 = ConvolutionLayer(out_channels, out_channels)
         self.noise2 = Noise(out_channels)
         self.adain2 = AdaIN(out_channels, w_dim)
         self.leakyrelu = nn.LeakyReLU(0.2, inplace=True)
@@ -113,23 +113,23 @@ class GeneratorBlock(nn.Module):
 class Generator(nn.Module):
     def __init__(self, in_channels, z_dim, w_dim, img_channels=3):
         super().__init__()
-        self.start = nn.Parameter(torch.ones(1, in_channels, 4, 4))
         self.map = MappingNetwork(z_dim, w_dim)
-        self.adain1 = AdaIN(in_channels, w_dim)
-        self.adain2 = AdaIN(in_channels, w_dim)
+        self.start = nn.Parameter(torch.ones(1, in_channels, 4, 4))
         self.noise1 = Noise(in_channels)
-        self.noise2 = Noise(in_channels)
+        self.adain1 = AdaIN(in_channels, w_dim)
         self.conv = nn.Conv2d(in_channels, in_channels, kernel_size=3, padding=1)
+        self.noise2 = Noise(in_channels)
         self.leakyrelu = nn.LeakyReLU(0.2, inplace=True)
-        self.rgb = ConvolutionalLayer(in_channels, img_channels, 1, 1, 0)
+        self.adain2 = AdaIN(in_channels, w_dim)
+        self.rgb = ConvolutionLayer(in_channels, img_channels, 1, 1, 0)
         self.progressive_blocks = nn.ModuleList([])
         self.rgb_layers = nn.ModuleList([self.rgb])
 
         for i in range(len(factors) - 1):
             conv_in_channels = int(in_channels*factors[i])
-            conv_out_channels = int(in_channels*factors[i])
+            conv_out_channels = int(in_channels*factors[i+1])
             self.progressive_blocks.append(GeneratorBlock(conv_in_channels, conv_out_channels, w_dim))
-            self.rgb_layers.append(ConvolutionalLayer(conv_in_channels, conv_out_channels, 1, 1, 0))
+            self.rgb_layers.append(ConvolutionLayer(conv_out_channels, img_channels, 1, 1, 0))
 
     def fade(self, alpha, upscaled, generated):
         return torch.tanh(alpha*generated + (1-alpha)*upscaled)
@@ -146,10 +146,72 @@ class Generator(nn.Module):
         
         for step in range(steps):
             upscaled_out = F.interpolate(out, scale_factor=2, mode="bilinear")
-            out = self.progressive_blocks[steps](upscaled_out, w)
+            out = self.progressive_blocks[step](upscaled_out, w)
 
         upscaled_out = self.rgb_layers[steps-1](upscaled_out)
         out = self.progressive_blocks[steps](out)
         out = self.fade(alpha, upscaled_out, out)
 
         return out
+    
+class ConvolutionBlock(nn.Module):
+    def __init__(self, in_channels, out_channels):
+        super().__init__()
+        self.conv1 = ConvolutionLayer(in_channels, out_channels)
+        self.conv2 = ConvolutionLayer(out_channels, out_channels)
+        self.leakyrelu = nn.LeakyReLU(0.2, inplace=True)
+
+    def forward(self, x):
+        x = self.leakyrelu(self.conv1(x))
+        x = self.leakyrelu(self.conv2(x))
+        return x
+    
+class Discriminator(nn.Module):
+    def __init__(self, in_channels, img_channels=3):
+        super().__init__()
+        self.progressive_blocks = nn.ModuleList([])
+        self.rgb_layers = nn.ModuleList([])
+        self.leakyrelu  = nn.LeakyReLU(0.2, inplace=True)
+
+        for i in range(len(factors) - 1, 0, -1):
+            conv_in_channels = int(in_channels*factors[i])
+            conv_out_channels = int(in_channels*factors[i-1])
+            self.progressive_blocks.append(ConvolutionBlock(conv_in_channels, conv_out_channels))
+            self.rgb_layers.append(ConvolutionLayer(img_channels, conv_in_channels, 1, 1, 0))
+
+        self.rgb = ConvolutionLayer(img_channels, in_channels, 1, 1, 0)
+        self.rgb_layers.append(self.rgb)
+        self.avg_pool = nn.AvgPool2d(kernel_size=2, stride=2)
+        self.final_block = nn.Sequential(
+            ConvolutionLayer(in_channels+1, in_channels),
+            nn.LeakyReLU(0.2),
+            ConvolutionLayer(in_channels, in_channels, 4, 1, 0),
+            nn.LeakyReLU(0.2),
+            ConvolutionLayer(in_channels, 1, 1, 1, 0)
+        )
+
+    def fade(self, alpha, downscaled, out):
+        return alpha*out + (1-alpha)*downscaled
+    
+    def batch_statistics(self, x):
+        batch_stats = torch.std(x, dim=0).mean().repeat(x.shape[0], 1, x.shape[2], x.shape[3])
+        return torch.cat([x, batch_stats], dim=1)
+    
+    def forward(self, x, alpha, steps):
+        current_step = len(self.progressive_blocks) - steps
+        out = self.leakyrelu(self.rgb_layers[current_step](x))
+
+        if steps == 0:
+            out = self.batch_statistics(out)
+            return self.final_block(out).view(out.shape[0], -1)
+        
+        downscaled = self.leakyrelu(self.rgb_layers[current_step+1](self.avg_pool(x)))
+        out = self.avg_pool(self.progressive_blocks[current_step](out))
+        out = self.fade(alpha, downscaled, out)
+
+        for step in range(current_step+1, len(self.progressive_blocks)):
+            out = self.progressive_blocks[step](out)
+            out = self.avg_pool(out)
+
+        out = self.batch_statistics(out)
+        return self.final_block(out).view(out.shape[0], -1)
