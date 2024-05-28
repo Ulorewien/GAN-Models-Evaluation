@@ -36,7 +36,7 @@ training_plot_save_path = args.TRAINING_PLOT_PATH
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 image_size = 64
-lr = 0.0002
+lr = 1e-3
 beta1 = 0.5
 batch_size = 64
 noise_dim = 100
