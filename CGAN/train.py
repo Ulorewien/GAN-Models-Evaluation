@@ -43,13 +43,19 @@ noise_dim = 100
 workers = 2
 num_epochs = 5
 classes = 10
+
 # Monitor Progress
 progress = list()
-fixed_noise = torch.randn(100, noise_dim, device=device)
-fixed_labels = torch.Tensor([[i]*10 for i in range(10)]).view(100,).int().to(device)
+fixed_noise = torch.randn(classes*10, noise_dim, device=device)
+fixed_labels = []
+for i in range(classes):
+    lab = [0 if j != i else 1 for j in range(classes)]
+    lab = lab*10
+    fixed_labels.append(lab)
+fixed_labels = torch.Tensor(fixed_labels).view(classes*10, classes).float().to(device)
 
-disc_net = Discriminator()
-gen_net = Generator()
+disc_net = Discriminator(classes)
+gen_net = Generator(classes)
 disc_net.to(device)
 gen_net.to(device)
 disc_net.apply(weights_init)
