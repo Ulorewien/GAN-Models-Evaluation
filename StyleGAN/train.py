@@ -12,7 +12,7 @@ from utils import gradient_penalty, generate_examples, check_loader, get_loader
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
-# Hyperparameters
+# Hyperparameters and global variables
 dataset_dir = "/kaggle/input/women-clothes"
 start_train_img_size = 4
 lr = 1e-3
