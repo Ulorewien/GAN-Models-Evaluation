@@ -43,7 +43,6 @@ class ConvBlock(nn.Module):
 
 
 # Train and Eval utilities
-
 def generate_examples(gen, steps, z_dim, n=100):
     gen.eval()
     alpha = 1.0
