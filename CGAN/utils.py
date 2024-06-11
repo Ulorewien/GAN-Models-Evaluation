@@ -19,9 +19,8 @@ def save_images(images, output_dir):
         os.makedirs(output_dir)
         
     for idx, img in enumerate(images):
+        img = img.permute(1, 2, 0)
         img = img.numpy()
-        c, h, w = img.shape
-        img = img.reshape(h, w, c)
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S_%f')
         filename = f'image_{timestamp}_{idx}.png'
         filepath = os.path.join(output_dir, filename)

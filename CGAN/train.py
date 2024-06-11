@@ -155,8 +155,6 @@ def eval(classes, model_path, num_images, output_dir):
     gen_net = Generator(classes)
     gen_net.to(device)
     gen_net.load_state_dict(torch.load(model_path))
-
-    iters = 0
     
     gen_net.eval()
     images = []
