@@ -7,10 +7,7 @@ class Generator(nn.Module):
         super(Generator, self).__init__()
         self.classes = classes
 
-        self.embedding = nn.Sequential(
-            nn.Embedding(classes, 100),
-            nn.Linear(100, 8*8)
-        )
+        self.embedding = nn.Linear(classes, 8*8)
 
         self.latent_vector = nn.Sequential(
             nn.Linear(100, 512*8*8),
@@ -46,7 +43,7 @@ class Generator(nn.Module):
 # Test Generator
 if __name__ == "__main__":
     x = torch.rand((2, 100))
-    label = torch.randint(0, 4, (2,))
+    label = torch.tensor([0, 0, 1, 0], dtype=torch.float)
     net = Generator(4)
     output = net(x, label)
     print(output.shape)

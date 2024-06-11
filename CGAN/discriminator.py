@@ -7,10 +7,7 @@ class Discriminator(nn.Module):
         super(Discriminator, self).__init__()
         self.classes = classes
 
-        self.embedding = nn.Sequential(
-            nn.Embedding(classes, 100),
-            nn.Linear(100, 1*64*64)
-        )
+        self.embedding = nn.Linear(classes, 1*64*64)
 
         conv_1 = self.conv_block(4, 64)
         conv_2 = self.conv_block(64, 128)
@@ -47,7 +44,7 @@ class Discriminator(nn.Module):
 # Test Discriminator
 if __name__ == "__main__":
     x = torch.rand((2, 3, 64, 64))
-    label = torch.randint(0, 4, (2,))
+    label = torch.tensor([0, 0, 1, 0], dtype=torch.float)
     net = Discriminator(4)
     out = net(x, label)
     print(out.shape)
