@@ -101,8 +101,10 @@ class GenBlock(nn.Module):
         return x
 
 class Generator(nn.Module):
-    def __init__(self, z_dim, w_dim, in_channels, img_channels=3):
+    def __init__(self, z_dim, w_dim, in_channels, img_channels=3, classes=3):
         super(Generator, self).__init__()
+        self.embedding = nn.Linear(classes, 8*8)
+
         self.starting_constant = nn.Parameter(torch.ones((1, in_channels, 4, 4)))
         self.map = NoiseMappingNetwork(z_dim, w_dim)
         self.initial_adain1 = AdaIN(in_channels, w_dim)
@@ -132,9 +134,11 @@ class Generator(nn.Module):
         # alpha should be scalar within [0, 1], and upscale.shape == generated.shape
         return torch.tanh(alpha * generated + (1 - alpha) * upscaled)
 
-    def forward(self, noise, alpha, steps):
+    def forward(self, label, noise, alpha, steps):
+        label_embedding = self.embedding(label).view(-1, 1, 8, 8)
         w = self.map(noise)
         x = self.initial_adain1(self.initial_noise1(self.starting_constant), w)
+        x = torch.concat((x, label_embedding), dim = 1)
         x = self.initial_conv(x)
         out = self.initial_adain2(self.leaky(self.initial_noise2(x)), w)
 

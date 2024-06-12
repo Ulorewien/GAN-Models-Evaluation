@@ -6,8 +6,10 @@ image_factors = [1, 1, 1, 1, 1 / 2, 1 / 4, 1 / 8, 1 / 16, 1 / 32]
 
 # Same as ProGAN Discriminator
 class Discriminator(nn.Module):
-    def __init__(self, in_channels, img_channels=3):
+    def __init__(self, in_channels, img_channels=3, classes=3):
         super(Discriminator, self).__init__()
+        self.embedding = nn.Linear(classes, 1*64*64)
+
         self.prog_blocks, self.rgb_layers = nn.ModuleList([]), nn.ModuleList([])
         self.leaky = nn.LeakyReLU(0.2)
 
@@ -58,7 +60,9 @@ class Discriminator(nn.Module):
         # will get information about the variation in the batch/image
         return torch.cat([x, batch_statistics], dim=1)
 
-    def forward(self, x, alpha, steps):
+    def forward(self, x, label, alpha, steps):
+        label_embedding = self.embedding(label).view(-1, 1, 64, 64)
+        x = torch.concat((x, label_embedding), dim=1)
         # where we should start in the list of prog_blocks, maybe a bit confusing but
         # the last is for the 4x4. So example let's say steps=1, then we should start
         # at the second to last because input_size will be 8x8. If steps==0 we just
