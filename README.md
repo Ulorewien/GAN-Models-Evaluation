@@ -190,12 +190,15 @@ This equation quantifies the dissimilarity between the feature distributions of 
 The training timelapses for all the datasets can be found at: `Outputs/CGAN/results'
 
 ![cgan_mnist](Outputs/CGAN/results/mnist_eval/image_20240611_135734_971312_0.png)
+
 CGAN - MNIST Results
 
 ![cgan_shoe](Outputs/CGAN/results/shoe_eval/image_20240611_135800_499414_0.png)
+
 CGAN - Shoe Results
 
 ![cgan_flowers](Outputs/CGAN/results/flower_eval/image_20240611_135649_620037_0.png)
+
 CGAN - Flower Results
 
 ### Conditional StyleGAN Results
@@ -203,12 +206,15 @@ CGAN - Flower Results
 The training timelapses for all the datasets can be found at: `Outputs/StyleGAN/results'
 
 ![cgan_mnist](Outputs/StyleGAN/results/mnist_eval/image_20240611_173211_242145_0.png)
+
 CStyleGAN - MNIST Results
 
 ![cgan_shoe](Outputs/StyleGAN/results/shoe_eval/image_20240611_173322_706611_0.png)
+
 CStyleGAN - Shoe Results
 
 ![cgan_flowers](Outputs/StyleGAN/results/flower_eval/image_20240611_173254_530852_0.png)
+
 CStyleGAN - Flower Results
 
 ## Acknowledgments
