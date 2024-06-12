@@ -9,14 +9,14 @@ This repository contains the comparison and evaluation of two GAN architectures 
 
 We focus on evaluating image realism, diversity, and style fidelity using the following custom datasets:
 
-1. **MNIST**: Handwritten digit dataset.
-2. **Shoe vs Sandal vs Boots**: A dataset containing images of shoes, sandals, and boots.
-3. **Flowers Dataset**: A dataset containing images of various types of flowers.
+1. **MNIST**: Handwritten digit dataset. [Link](https://www.kaggle.com/datasets/scolianni/mnistasjpg)
+2. **Shoe vs Sandal vs Boots**: A dataset containing images of shoes, sandals, and boots. [Link](https://www.kaggle.com/datasets/hasibalmuzdadid/shoe-vs-sandal-vs-boot-dataset-15k-images)
+3. **Flowers Dataset**: A dataset containing images of various types of flowers. [Link](https://www.kaggle.com/datasets/utkarshsaxenadn/flower-classification-5-classes-roselilyetc)
 
 ## Repository Structure
 
 - **CGAN**: Contains all files related to the training and architecture of the Conditional GAN.
-- **StyleGAN**: Contains all files related to the training and architecture of the Conditional StyleGAN.
+- **CStyleGAN**: Contains all files related to the training and architecture of the Conditional StyleGAN.
 - **Notebooks**: Contains all Jupyter notebooks used for training and experimentation.
 - **Outputs**: Contains model checkpoints, output images, and transition videos of image generation over the training process.
 
@@ -98,7 +98,7 @@ For running on a server or local machine without Jupyter:
 1. **Navigate to the respective model directory (CGAN or StyleGAN):**
 
     ```bash
-    cd CGAN  # or `cd StyleGAN`
+    cd CGAN  # or `cd CStyleGAN`
     ```
 
 2. **Run the training script:**
@@ -205,15 +205,15 @@ CGAN - Flower Results
 
 The training timelapses for all the datasets can be found at: `Outputs/StyleGAN/results'
 
-![cgan_mnist](Outputs/StyleGAN/results/mnist_eval/image_20240611_173211_242145_0.png)
+![cgan_mnist](Outputs/CStyleGAN/results/mnist_eval/image_20240611_173211_242145_0.png)
 
 CStyleGAN - MNIST Results
 
-![cgan_shoe](Outputs/StyleGAN/results/shoe_eval/image_20240611_173322_706611_0.png)
+![cgan_shoe](Outputs/CStyleGAN/results/shoe_eval/image_20240611_173322_706611_0.png)
 
 CStyleGAN - Shoe Results
 
-![cgan_flowers](Outputs/StyleGAN/results/flower_eval/image_20240611_173254_530852_0.png)
+![cgan_flowers](Outputs/CStyleGAN/results/flower_eval/image_20240611_173254_530852_0.png)
 
 CStyleGAN - Flower Results
 
