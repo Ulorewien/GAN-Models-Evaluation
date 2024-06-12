@@ -1,0 +1,1 @@
+The models for cStyleGAN were very large and we were unable to upload it to GitHub. Contact us if you need the trained models. 
