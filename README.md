@@ -39,16 +39,16 @@ cd GAN-Models-Evaluation
 
 1. **Create a virtual environment:**
 
-    ```bash
-    python -m venv venv
-    source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-    ```
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+   ```
 
 2. **Install the required packages:**
 
-    ```bash
-    pip install -r requirements.txt
-    ```
+   ```bash
+   pip install -r requirements.txt
+   ```
 
 ### Dataset Preparation
 
@@ -79,15 +79,15 @@ datasets/
 
 1. **Navigate to the Notebooks directory:**
 
-    ```bash
-    cd Notebooks
-    ```
+   ```bash
+   cd Notebooks
+   ```
 
 2. **Launch Jupyter Notebook:**
 
-    ```bash
-    jupyter notebook
-    ```
+   ```bash
+   jupyter notebook
+   ```
 
 3. Open the respective notebook for CGAN or StyleGAN and run the cells to start training.
 
@@ -97,15 +97,15 @@ For running on a server or local machine without Jupyter:
 
 1. **Navigate to the respective model directory (CGAN or StyleGAN):**
 
-    ```bash
-    cd CGAN  # or `cd CStyleGAN`
-    ```
+   ```bash
+   cd CGAN  # or `cd CStyleGAN`
+   ```
 
 2. **Run the training script:**
 
-    ```bash
-    python train.py -d path/to/data_dir -m path/to/model_save_path -a path/to/animation_save_path -e path/to/eval_images_save_path -t path/to/training_plot_path
-    ```
+   ```bash
+   python train.py -d path/to/data_dir -m path/to/model_save_path -a path/to/animation_save_path -e path/to/eval_images_save_path -t path/to/training_plot_path
+   ```
 
 ### Command-Line Arguments
 
@@ -142,16 +142,16 @@ The CGAN model is a type of GAN where both the generator and discriminator are c
 ![cgan_arch](Outputs/cgan_diagram.jpg)
 
 - **Architecture:**
-    - Generator: Takes a noise vector and class label as input and generates an image.
-    - Discriminator: Takes an image and class label as input and outputs a probability of the image being real or fake.
+  - Generator: Takes a noise vector and class label as input and generates an image.
+  - Discriminator: Takes an image and class label as input and outputs a probability of the image being real or fake.
 
 #### Conditional StyleGAN (cStyleGAN)
 
 The cStyleGAN model builds upon the StyleGAN architecture, incorporating class labels to generate images of specific categories with high style fidelity and diversity.
 
 - **Architecture:**
-    - Generator: Uses style vectors to control different aspects of the generated image and is conditioned on class labels.
-    - Discriminator: Evaluates the realism of images conditioned on class labels.
+  - Generator: Uses style vectors to control different aspects of the generated image and is conditioned on class labels.
+  - Discriminator: Evaluates the realism of images conditioned on class labels.
 
 ## Outputs
 
@@ -168,6 +168,7 @@ We evaluate the models based on:
 **Fréchet Inception Distance (FID)**: In FID, we use the Inception network to extract features from an intermediate layer. Then we model the data distribution for these features using a multivariate Gaussian distribution with mean $\mu$ and covariance $\sum$. The FID between the real images x and generated images g is computed as: $$\text{FID}(x, g) = ||\mu_{\text{real}} - \mu_{\text{gen}}||^2 + \text{Tr}(\Sigma_{\text{real}} + \Sigma_{\text{gen}} - 2(\Sigma_{\text{real}}\Sigma_{\text{gen}})^{1/2})$$
 
 Where:
+
 - $||\cdot||$ denotes the Euclidean distance between vectors.
 - $\text{Tr}(\cdot)$ represents the trace operator, which computes the sum of the diagonal elements of a matrix.
 - $(\Sigma_{\text{real}}\Sigma_{\text{gen}})^{1/2}$ denotes the matrix square root of the product of the covariance matrices.
@@ -176,46 +177,46 @@ This equation quantifies the dissimilarity between the feature distributions of 
 
 ## Results
 
-| Dataset                  | Model   | FID Score |
-|--------------------------|---------|-----------|
-| MNIST                    | cGAN    | 2.5       |
-|                          | cSGAN   | 3.8       |
-| Shoe vs Sandal vs Boot   | cGAN    | 24.3      |
-|                          | cSGAN   | 10.1      |
-| Flower Classification    | cGAN    | 30.7      |
-|                          | cSGAN   | 20.5      |
+| Dataset                | Model | FID Score |
+| ---------------------- | ----- | --------- |
+| MNIST                  | cGAN  | 2.5       |
+|                        | cSGAN | 3.8       |
+| Shoe vs Sandal vs Boot | cGAN  | 24.3      |
+|                        | cSGAN | 10.1      |
+| Flower Classification  | cGAN  | 30.7      |
+|                        | cSGAN | 20.5      |
 
 ### CGAN Results
 
 The training timelapses for all the datasets can be found at: `Outputs/CGAN/results'
 
+CGAN - MNIST Results:
+
 ![cgan_mnist](Outputs/CGAN/results/mnist_eval/image_20240611_135734_971312_0.png)
 
-CGAN - MNIST Results
+CGAN - Shoe Results:
 
 ![cgan_shoe](Outputs/CGAN/results/shoe_eval/image_20240611_135800_499414_0.png)
 
-CGAN - Shoe Results
+CGAN - Flower Results:
 
 ![cgan_flowers](Outputs/CGAN/results/flower_eval/image_20240611_135649_620037_0.png)
-
-CGAN - Flower Results
 
 ### Conditional StyleGAN Results
 
 The training timelapses for all the datasets can be found at: `Outputs/StyleGAN/results'
 
+CStyleGAN - MNIST Results:
+
 ![cgan_mnist](Outputs/CStyleGAN/results/mnist_eval/image_20240611_173211_242145_0.png)
 
-CStyleGAN - MNIST Results
+CStyleGAN - Shoe Results:
 
 ![cgan_shoe](Outputs/CStyleGAN/results/shoe_eval/image_20240611_173322_706611_0.png)
 
-CStyleGAN - Shoe Results
+CStyleGAN - Flower Results:
 
 ![cgan_flowers](Outputs/CStyleGAN/results/flower_eval/image_20240611_173254_530852_0.png)
-
-CStyleGAN - Flower Results
 
 ## Acknowledgments
 
